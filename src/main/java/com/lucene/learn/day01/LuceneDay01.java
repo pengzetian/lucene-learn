@@ -1,16 +1,12 @@
 package com.lucene.learn.day01;
 
-import com.google.common.io.Files;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -20,11 +16,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.Test;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
 import java.nio.file.Paths;
-import java.util.List;
 
 
 /**
@@ -117,9 +109,19 @@ public class LuceneDay01 {
         directory = FSDirectory.open(Paths.get("indexDir/"));
         // 通过reader 可以有效的获取到文档的数量
         IndexReader reader = DirectoryReader.open(directory);
-        
         System.out.println("numDocs: "+ reader.numDocs());
         System.out.println("maxDocs:" +reader.maxDoc());
+        System.out.println("deleteDocs:" + reader.numDeletedDocs());
+    }
+    
+    @Test
+    public void deleteDocument() throws Exception{
+        directory = FSDirectory.open(Paths.get("indexDir/"));
+        IndexWriter writer = getWriter(directory);
+        //把id 为1 的document 删除掉，
+        //参数是一个选项，可以是一个Query, 也可以是一个term, term是一个精确查找的值
+        //此时删除的文档 并不会被完全删除，而是存储在一个回收站中，可以恢复
+        writer.deleteDocuments(new Term("id","2"));
     }
     
     
